@@ -52,38 +52,33 @@ const Search = () => {
       currentUser.uid > user.uid
         ? currentUser.uid + user.uid
         : user.uid + currentUser.uid;
-    console.log({ combinedId });
+
     try {
+      //try find if we chatted before
       const res = await getDoc(doc(db, "chats", combinedId));
-      console.log({ res });
+      //if not try to make converstion
       if (!res.exists()) {
         //create a chat in chats collection
         await setDoc(doc(db, "chats", combinedId), { messages: [] });
         //create user chats
-        try {
-          console.log("before update currentUser ");
-          await updateDoc(doc(db, "userChats", currentUser.uid), {
-            [combinedId + ".userInfo"]: {
-              uid: user.uid,
-              displayName: user.displayName,
-              photoURL: user.photoURL,
-            },
-            [combinedId + ".date"]: serverTimestamp(),
-          });
-          console.log("after update currentUser ");
-          console.log("before update user ");
-          await updateDoc(doc(db, "userChats", user.uid), {
-            [combinedId + ".userInfo"]: {
-              uid: currentUser.uid,
-              displayName: currentUser.displayName,
-              photoURL: currentUser.photoURL,
-            },
-            [combinedId + ".date"]: serverTimestamp(),
-          });
-          console.log("after update user ");
-        } catch (error) {
-          console.error("Error updating userChats:", error);
-        }
+
+        await updateDoc(doc(db, "userChats", currentUser.uid), {
+          [combinedId + ".userInfo"]: {
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          },
+          [combinedId + ".date"]: serverTimestamp(),
+        });
+
+        await updateDoc(doc(db, "userChats", user.uid), {
+          [combinedId + ".userInfo"]: {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+          },
+          [combinedId + ".date"]: serverTimestamp(),
+        });
       }
     } catch (err) {
       console.log({ err });

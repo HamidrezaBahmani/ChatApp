@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const [err, setErr] = useState(false);
+  const [serr, setSerr] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -51,6 +52,8 @@ export const Register = () => {
       );
     } catch (err) {
       setErr(true);
+      console.log(err.message);
+      setSerr(err.message);
     }
   };
 
@@ -69,7 +72,7 @@ export const Register = () => {
             <span>Add an avatar</span>
           </label>
           <button>Sign up</button>
-          {err && <span>Something went wrong</span>}
+          {err && <span>Something went wrong:{serr}</span>}
         </form>
         <p>
           You do have an account? <Link to="/login">Login</Link>
