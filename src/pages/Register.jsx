@@ -23,7 +23,7 @@ export const Register = () => {
       console.log({ res });
 
       const storageRef = ref(storage, displayName);
-      console.log({ storageRef });
+
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(

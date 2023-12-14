@@ -19,11 +19,6 @@ const Search = () => {
 
   const { currentUser } = useContext(AuthContext);
 
-  useEffect(() => {
-    // This effect runs whenever `user` is updated
-    console.log("Updated user:", user);
-  }, [user]);
-
   const handleSearch = async () => {
     const q = query(
       collection(db, "users"),
@@ -98,6 +93,7 @@ const Search = () => {
           placeholder="Find a user"
           onChange={(e) => setUsername(e.target.value)}
           onKeyDown={handleKey}
+          value={username}
         />
       </div>
       {err && <span>User not Found!</span>}
