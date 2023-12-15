@@ -30,24 +30,22 @@ export const Register = () => {
         (error) => {
           setErr(true);
         },
-        async () => {
-          await getDownloadURL(uploadTask.snapshot.ref).then(
-            async (downloadURL) => {
-              await updateProfile(res.user, {
-                displayName,
-                photoURL: downloadURL,
-              });
-              await setDoc(doc(db, "users", res.user.uid), {
-                uid: res.user.uid,
-                displayName,
-                email,
-                photoURL: downloadURL,
-              });
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+            await updateProfile(res.user, {
+              displayName,
+              photoURL: downloadURL,
+            });
+            await setDoc(doc(db, "users", res.user.uid), {
+              uid: res.user.uid,
+              displayName,
+              email,
+              photoURL: downloadURL,
+            });
 
-              await setDoc(doc(db, "userChats", res.user.uid), {});
-              navigate("/");
-            }
-          );
+            await setDoc(doc(db, "userChats", res.user.uid), {});
+            navigate("/");
+          });
         }
       );
     } catch (err) {
