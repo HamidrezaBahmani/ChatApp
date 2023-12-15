@@ -4,7 +4,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 export const Loging = () => {
   const [err, setErr] = useState(false);
-  const [serr, setSerr] = useState(null);
+  const [errs, setErrs] = useState(null);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,12 +15,12 @@ export const Loging = () => {
     const password = e.target[1].value;
 
     try {
-      signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       navigate("/");
     } catch (err) {
+      setErrs(err.message);
+
       setErr(true);
-      console.log(err.message);
-      setSerr(err.message);
     }
   };
 
@@ -33,7 +34,7 @@ export const Loging = () => {
           <input type="password" placeholder="password" />
 
           <button>Sign in</button>
-          {err && <span>Something went wrong:{serr}</span>}
+          {err && <span>Something went wrong: {errs}</span>}
         </form>
         <p>
           You don't have an account? <Link to="/register">Register</Link>
