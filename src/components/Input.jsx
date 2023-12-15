@@ -12,39 +12,48 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const Input = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
 
-  const handleSend = async () => {
-    if (img) {
-      const storageRef = ref(storage, uuid());
+  const handleImageUpload = async () => {
+    const storageRef = ref(storage, uuid());
+    const uploadTask = uploadBytesResumable(storageRef, img);
 
-      const uploadTask = uploadBytesResumable(storageRef, img);
-      uploadTask.on(
-        (error) => {
-          setErr(true);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateDoc(doc(db, "chats", data.chatId), {
-              messages: arrayUnion({
-                id: uuid(),
-                text,
-                senderId: currentUser.uid,
-                date: Timestamp.now(),
-                img: downloadURL,
-              }),
-            });
-          });
-        }
-      );
-    } else {
+    try {
+      await uploadTask;
+
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+      await updateDoc(doc(db, "chats", data.chatId), {
+        messages: arrayUnion({
+          id: uuid(),
+          text,
+          senderId: currentUser.uid,
+          date: Timestamp.now(),
+          img: downloadURL,
+        }),
+      });
+
+      setImg(null);
+      setText("");
+      setLoading(false);
+    } catch (error) {
+      console.error("Error uploading image:", error.message);
+      // Handle errors and display a user-friendly notification
+      setErr(true);
+      setLoading(false);
+    }
+  };
+
+  const handleTextMessageSend = async () => {
+    try {
       await updateDoc(doc(db, "chats", data.chatId), {
         messages: arrayUnion({
           id: uuid(),
@@ -53,24 +62,25 @@ const Input = () => {
           date: Timestamp.now(),
         }),
       });
+
+      setText("");
+      setLoading(false);
+    } catch (error) {
+      console.error("Error updating Firestore:", error.message);
+      // Handle Firestore update errors and display a user-friendly notification
+      setErr(true);
+      setLoading(false);
     }
+  };
 
-    await updateDoc(doc(db, "userChats", currentUser.uid), {
-      [data.chatId + ".lastMessage"]: {
-        text,
-      },
-      [data.chatId + ".date"]: serverTimestamp(),
-    });
+  const handleSend = async () => {
+    setLoading(true);
 
-    await updateDoc(doc(db, "userChats", data.user.uid), {
-      [data.chatId + ".lastMessage"]: {
-        text,
-      },
-      [data.chatId + ".date"]: serverTimestamp(),
-    });
-
-    setText("");
-    setImg(null);
+    if (img) {
+      await handleImageUpload();
+    } else {
+      await handleTextMessageSend();
+    }
   };
 
   return (
@@ -92,7 +102,9 @@ const Input = () => {
         <label htmlFor="file">
           <img src={Img} alt="" />
         </label>
-        <button onClick={handleSend}>Send</button>
+        <button onClick={handleSend} disabled={loading}>
+          {loading ? "Sending..." : "Send"}
+        </button>
       </div>
     </div>
   );

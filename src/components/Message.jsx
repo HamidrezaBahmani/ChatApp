@@ -11,7 +11,14 @@ const Message = ({ message }) => {
   useEffect(() => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   }, [message]);
+  // console.log(message.date);
+  const timestampInMilliseconds =
+    message.date.seconds * 1000 + Math.floor(message.date.nanoseconds / 1e6);
+  const messageDate = new Date(timestampInMilliseconds);
 
+  // Extract hour and minute
+  const hour = messageDate.getHours();
+  const minute = messageDate.getMinutes();
   return (
     <div
       ref={ref}
@@ -26,7 +33,9 @@ const Message = ({ message }) => {
           }
           alt=""
         />
-        <span>just now</span>
+        <span>
+          {hour}:{minute}
+        </span>
       </div>
       <div className="messageContent">
         <p>{message.text}</p>
