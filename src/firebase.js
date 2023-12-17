@@ -1,14 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage, getDownloadURL } from "firebase/storage";
+import { getStorage } from "firebase/storage";
+require("dotenv").config();
 const firebaseConfig = {
-  apiKey: "AIzaSyCtYa2uRXSiKqnkWkHXib8D24P_PuJuB1k",
-  authDomain: "chat-308a4.firebaseapp.com",
-  projectId: "chat-308a4",
-  storageBucket: "chat-308a4.appspot.com",
-  messagingSenderId: "1091682179857",
-  appId: "1:1091682179857:web:207da461a4ae0017464ab0",
+  apiKey: process.env.APIKEY,
+  authDomain: process.env.AUTHDOMAIN,
+  projectId: process.env.PROJECTID,
+  storageBucket: process.env.STORAGEBUCKET,
+  messagingSenderId: process.env.MESSAGINGSENDERID,
+  appId: process.env.APPID,
 };
 
 export const app = initializeApp(firebaseConfig);
