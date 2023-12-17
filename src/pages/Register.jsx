@@ -17,37 +17,31 @@ export const Register = () => {
     const email = e.target[1].value;
     const password = e.target[2].value;
     const file = e.target[3].files[0];
-    console.log(displayName, email, password);
+
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      console.log({ res });
 
       const storageRef = ref(storage, displayName);
-
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.on(
-        (error) => {
-          setErr(true);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await updateProfile(res.user, {
-              displayName,
-              photoURL: downloadURL,
-            });
-            await setDoc(doc(db, "users", res.user.uid), {
-              uid: res.user.uid,
-              displayName,
-              email,
-              photoURL: downloadURL,
-            });
+      await uploadTask.then(async (snapshot) => {
+        const downloadURL = await getDownloadURL(snapshot.ref);
 
-            await setDoc(doc(db, "userChats", res.user.uid), {});
-            navigate("/");
-          });
-        }
-      );
+        await updateProfile(res.user, {
+          displayName,
+          photoURL: downloadURL,
+        });
+
+        await setDoc(doc(db, "users", res.user.uid), {
+          uid: res.user.uid,
+          displayName,
+          email,
+          photoURL: downloadURL,
+        });
+
+        await setDoc(doc(db, "userChats", res.user.uid), {});
+        navigate("/");
+      });
     } catch (err) {
       setErr(true);
       console.log(err.message);
@@ -70,7 +64,7 @@ export const Register = () => {
             <span>Add an avatar</span>
           </label>
           <button>Sign up</button>
-          {err && <span>Something went wrong:{serr}</span>}
+          {err && <span>Something went wrong: {serr}</span>}
         </form>
         <p>
           You do have an account? <Link to="/login">Login</Link>
@@ -79,4 +73,5 @@ export const Register = () => {
     </div>
   );
 };
+
 export default Register;
