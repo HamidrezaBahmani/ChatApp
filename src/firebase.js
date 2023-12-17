@@ -1,24 +1,17 @@
-// Importing necessary functions from the Firebase Modular SDK
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-
-// Defining Firebase configuration directly (without dotenv)
-
+import { getStorage, getDownloadURL } from "firebase/storage";
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_APIKEY,
-  authDomain: import.meta.env.VITE_AUTHDOMAIN,
-  projectId: import.meta.env.VITE_PROJECTID,
-  storageBucket: import.meta.env.VITE_STORAGEBUCKET,
-  messagingSenderId: import.meta.env.VITE_MESSAGINGSENDERID,
-  appId: import.meta.env.VITE_APPID,
+  apiKey: "AIzaSyCtYa2uRXSiKqnkWkHXib8D24P_PuJuB1k",
+  authDomain: "chat-308a4.firebaseapp.com",
+  projectId: "chat-308a4",
+  storageBucket: "chat-308a4.appspot.com",
+  messagingSenderId: "1091682179857",
+  appId: "1:1091682179857:web:207da461a4ae0017464ab0",
 };
 
-// Initializing Firebase with the configuration
 export const app = initializeApp(firebaseConfig);
-
-// Initializing Firebase services (authentication, storage, and Firestore)
 export const auth = getAuth();
 export const storage = getStorage();
 export const db = getFirestore();
